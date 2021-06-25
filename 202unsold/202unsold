@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+
+import  sys
+import  math
+
+def man_help():
+    print("USAGE\n    ./202unsold  a b\n\n"
+          "DESCRIPTION\n"
+          "     a     constant computed from past results\n"
+          "     b     constant computed from past results")
+    sys.exit(0)
+    
+
+class MyStruct:
+    X = []
+    Y = []
+    a = 0
+    b = 0
+    var_X = 0.0
+    var_Y = 0.0
+    exp_valueX = 0.0
+    exp_valueY = 0.0
+
+def proba(x, y, a, b):
+    res = ((a - x) * (b - y)) / ((5 * a - 150) * (5 * b - 150))
+    return res
+
+
+def total(tab, i, j, z):
+    result = 0
+    d = 0
+    while d < 5:
+        result += tab[i][j]
+        if z == 1:
+            j += 1
+        else:
+            i += 1
+        d += 1
+    return result
+
+
+def first_part():
+    print("--------------------------------------------------------------------------------")
+    print("\tX=10\tX=20\tX=30\tX=40\tX=50\tY law")
+    tab = [[float(proba((x + 1) * 10, (y + 1) * 10,  struc.a,  struc.b))
+            for x in range(5)] for y in range(5)]
+    get_results( struc.a,  struc.b, tab)
+    print("X law\t", end='')
+    get_total( struc.a,  struc.b, tab)
+    
+    
+
+def get_results (a, b, tab):
+    for i in range(len(tab)):
+            print("Y=" + str((i + 1) * 10), end='\t')
+            for j in range(len(tab[i])):
+                    print("%.3f" % tab[i][j], end='\t')
+                    
+            struc.Y.append(total(tab, i, 0, 1))
+            print("%.3f" % total(tab, i, 0, 1))
+
+
+def get_total (a, b, tab):
+    for h in range(len(tab) - 1):
+        struc.X.append(total(tab, 0, h, 0))
+        print("%.3f" % total(tab, 0, h, 0), end='\t')
+
+    struc.X.append(total(tab, 0, h + 1, 0))
+    print("%.3f" % total(tab, 0, h + 1, 0) + "\t1.000")
+
+
+def second_part():
+    z = 2
+    print("--------------------------------------------------------------------------------")
+    print("z\t20\t30\t40\t50\t60\t70\t80\t90\t100\np(Z=z)", end='')
+    for z in range(2, 11):
+        result = 0.0
+        sum = 0.0
+        for y in range(1, 6):
+            for x in range(1, 6):
+                result = proba(x * 10, y * 10,  struc.a,  struc.b)
+                if (x + y == z and y < 6):
+                    sum += result
+        print("\t%0.3f" %(sum), end='')
+
+def third_part():
+    for i in range(0, 5):
+        struc.exp_valueX += struc.X[i] * ((i + 1) * 10)
+        struc.exp_valueY += struc.Y[i] * ((i + 1) * 10)
+    for i in range(0, 5):
+        struc.var_X += ((i + 1) * 10 - struc.exp_valueX) * ((i + 1) 
+            * 10 - struc.exp_valueX) * struc.X[i]
+        struc.var_Y += ((i + 1) * 10 - struc.exp_valueY) * ((i + 1) 
+            * 10 - struc.exp_valueY) * struc.Y[i]
+    print("\n--------------------------------------------------------------------------------")
+    print("expected value of X:\t" + "%0.1f" %(struc.exp_valueX))
+    print("variance of X:\t\t" + "%0.1f" %(struc.var_X))
+    print("expected value of Y:\t" + "%0.1f" %(struc.exp_valueY))
+    print("variance of Y:\t\t" + "%0.1f" %(struc.var_Y))
+    print("expected value of Z:\t" + "%0.1f" %(struc.exp_valueX + struc.exp_valueY))
+    print("variance of Z:\t\t" + "%0.1f" %(struc.var_X + struc.var_Y))
+    print("--------------------------------------------------------------------------------")
+
+
+        
+if __name__ == '__main__':
+    
+    struc = MyStruct()
+    if len(sys.argv) == 2 and sys.argv[1] == "-h":
+        man_help()
+    elif len(sys.argv) == 3:
+        try :
+            int(sys.argv[1])
+            int(sys.argv[2])
+        except ValueError :
+            sys.stdout.write("ERROR : arguments must be number\n")
+            exit(84)
+                    
+        if int(sys.argv[2]) < 50 or int(sys.argv[1]) < 50:
+                sys.stdout.write("ERROR : arguments must be seperior than 50\n")
+                exit(84)
+        struc.a = int(sys.argv[1])
+        struc.b = int(sys.argv[2])
+        first_part()
+        second_part()
+        third_part()
+    
+    else:
+        sys.stdout.write("ERROR : must have two argument\n")
+        exit(84)
+
+#initialise a et b à 0 dans la classe, puiis apres que les test passer, args.

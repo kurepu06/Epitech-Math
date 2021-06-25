@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+
+from math import pi, sqrt, exp
+from sys import stderr
+import argparse
+from sys import argv
+import time
+
+
+
+def error(str: str) -> None:
+    stderr.write(str)
+    exit(84)
+
+def man_help():
+    print("USAGE")
+    print("\t./205IQ u s [IQ1] [IQ2]\n")
+    print("DESCRIPTION")
+    print("\tu\tmean")
+    print("\ts\tstandard deviation")
+    print("\tIQ1\tminimum IQ")
+    print("\tIQ2\tmaximum IQ")
+    exit(0)
+
+def basic_result(a, b):
+    if 0 < b < 200 and 0 < a < 200:
+        IQ_proba = []
+        for i in range (0, 201):
+            res = 1 / (b * sqrt(2 * pi)) * \
+                exp(-0.5 * pow((i - a) / b, 2))
+            IQ_proba.append(res)
+        return IQ_proba
+    else:
+        error('mu must be integer between 0 and 200.\n')
+
+def inferior_result(a,b,c):
+    if 0 < c < 200:
+        res = 0
+        for i in range(0, c * 100):
+            res += 1 / (b * sqrt(2 * pi)) * \
+                exp(-0.5 * pow(((i / 100) - a) / b, 2))
+        print('{:.01f}% of people have an IQ inferior to {:d}'
+            .format(res, c))
+    else:
+        error('IQ must be integer between 0 and 200.\n')
+
+def between_result(a,b,c,d):
+    if 0 < c < d < 200:
+        res = 0
+        i = c
+        while (i < d):
+            res += 1 / (b * sqrt(2 * pi)) * \
+                exp(-0.5 * pow((i - a) / b, 2))
+            i += 0.01
+        print('{:.01f}% of people have an IQ between {:d} and {:d}'
+              .format(res, c, d))
+    else:
+        error('IQ must be between 0 and 200 and IQ1 < IQ2.\n')
+
+def tab_format(IQ_tab: [float]):
+    for i in range(0, 201):
+        print('{:d} {:.05f}' .format(i, IQ_tab[i]))
+
+if __name__ == "__main__":
+    try :
+        if (len(argv) == 2 and argv[1] == "-h"):
+                man_help()
+        elif len(argv) >= 3 and len(argv) <= 5:
+            if len(argv) == 3:
+                a = round(float(argv[1]))
+                b = round(float(argv[2]))
+                tab_format(basic_result(a,b))
+            elif len(argv) == 4:
+                a = round(float(argv[1]))
+                b = round(float(argv[2]))
+                c = round(float(argv[3]))
+                inferior_result(a,b,c)
+            elif len(argv) == 5:
+                a = round(float(argv[1]))
+                b = round(float(argv[2]))
+                c = round(float(argv[3]))
+                d = round(float(argv[4]))
+                between_result(a,b,c,d)
+        else:
+            error('Error : Invalid arguments.\n')
+    except ValueError:
+            error("Error : Not the right type of parameter !\n")
+     

@@ -1,0 +1,101 @@
+#!/usr/bin/python3
+
+from sys import argv, stderr
+import argparse, csv, sys
+from operator import add
+from math import factorial, sqrt, exp, pi
+
+        
+def error(str: str) -> None:
+    stderr.write(str)
+    exit(84)
+
+if len(argv) < 4:
+    error('Error : Invalid number of arguments.\n')
+
+try :
+    pSize = int(argv[1])
+    sSize = int(argv[2])
+    p = float(argv[3])
+except ValueError:
+        error("Error : Not the right type of parameter !\n")
+
+variance =  p/100*(1-p/100)*(pSize-sSize)/(sSize*(pSize-1))
+
+def man_help():
+    print("USAGE")
+    print("\t./209poll pSize sSize p\n")
+    print("DESCRIPTION")
+    print("\tpSize\tsize of the population")
+    print("\tsSize\tsize of the sample (supposed to be representative)")
+    print("\tp\t percentage of voting intentions for a specific candidate")
+    exit(0)
+    
+def check_value():
+    try :
+        assert pSize > 0, 'pSize must be positif'
+        assert sSize > 0, 'pSize must be positif'
+        assert 0.00 <= p <= 100.00, 'p is a percentage'
+        assert pSize >= sSize, 'pSize must superior than sSize'
+    except (AssertionError, IndexError, ValueError):
+        error("Error : wrong argument (consistence)")
+
+    
+if (len(argv) == 2 and argv[1] == "-h" or argv[1] == "--help"):
+    man_help()
+    
+def population_size():
+    print("Population size:\t{}".format(pSize))
+def Sample_size():
+    print("Sample size:\t\t{}".format(sSize))
+def Voting_intentions():
+    print("Voting intentions:\t{:.2f}%".format(p))
+    
+def first_print():
+    population_size()
+    Sample_size()
+    Voting_intentions()
+
+def calc_variance():
+    print("Variance:\t\t{:.6f}".format(variance))
+
+def ninety_five():
+    inter = ((2*(1.96*sqrt(variance))) * 100)/2
+    res_low = p - inter
+    res_high = p + inter
+    
+    if res_low < 0 :
+        res_low = 0
+    
+    if res_high > 100 :
+        res_high = 100
+    print("95% confidence interval: [{:.2f}%; {:.2f}%]".format(res_low, res_high))
+
+def ninety_nine():
+    inter = ((2*(2.58*sqrt(variance))) * 100)/2
+    res_low = p - inter
+    res_high = p + inter
+    
+    if res_low < 0 :
+        res_low = 0
+    
+    if res_high > 100 :
+        res_high = 100
+    print("99% confidence interval: [{:.2f}%; {:.2f}%]".format(res_low, res_high))
+    
+def second_print():
+    calc_variance()
+    ninety_five()
+    ninety_nine()
+
+    
+if __name__ == "__main__":
+    try :
+        if len(argv) == 4:
+            check_value()
+            first_print()
+            second_print()
+        else :
+            error('Error : Invalid arguments.\n')
+    except ValueError:
+        error("Error : Not the right type of parameter !\n")

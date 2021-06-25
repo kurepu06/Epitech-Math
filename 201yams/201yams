@@ -1,0 +1,180 @@
+#!/usr/bin/env python3
+
+import  sys
+import  math
+
+def     man_help():
+    print("USAGE\n    ./201yams  int(sys.argv[1])  int(sys.argv[2])  int(sys.argv[3])  int(sys.argv[4])  int(sys.argv[5]) c\n\n"
+          "DESCRIPTION\n"
+          "     d1     value of the first die (0 if not thrown)\n"
+          "     d2     value of the second die (0 if not thrown)\n"
+          "     d3     value of the third die (0 if not thrown)\n"
+          "     d4     value of the fourth die (0 if not thrown)\n"
+          "     d5     value of the fifth die (0 if not thrown)\n"
+          "     c      expected combinaison"
+          )
+    sys.exit(0)
+
+def     get_dice(char):
+    try:
+        nbr = int(char)
+    except:
+        raise Exception("the dice's result should only be between 1 and 6 (0 if not thrown)\n")
+    if nbr > 6 or nbr < 0:
+        raise Exception("the dice's result should only be between 1 and 6 (0 if not thrown)\n")
+    return nbr
+
+def     binomial(a, b):
+    try:
+        result = (math.factorial(a) / (math.factorial(b) * math.factorial(a - b))) * pow((1 / 6), b) * pow((5 / 6), (a - b))
+    except:
+        raise Exception("Error :(\n")
+    return result
+
+def     dice_frequency(nb):
+    freq = 0
+    if  int(sys.argv[1]) == nb:
+        freq += 1
+    if  int(sys.argv[2]) == nb:
+        freq += 1
+    if  int(sys.argv[3]) == nb:
+        freq += 1
+    if  int(sys.argv[4]) == nb:
+        freq += 1
+    if  int(sys.argv[5]) == nb:
+        freq += 1
+    return freq
+
+def     pair(number):
+    result = 0.0
+    dice = 2
+    freq = dice_frequency(number)
+    if dice < freq:
+        result = 1
+    else:
+        for n in range(dice - freq, 6 - freq):
+            result += binomial(5 - freq, n)
+    return result * 100
+
+def     three(number):
+    result = 0.0
+    dice = 3
+    freq = dice_frequency(number)
+    if dice < freq:
+        result = 1
+    else:
+        for n in range(dice - freq, 6 - freq):
+            result += binomial(5 - freq, n)
+    return result * 100
+
+def     four(number):
+    result = 0.0
+    dice = 4
+    freq = dice_frequency(number)
+    if dice < freq:
+        result = 1
+    else:
+        for n in range(dice - freq, 6 - freq):
+            result += binomial(5 - freq, n)
+    return result * 100
+
+def     yams(number):
+    result = 0.0
+    dice = 5
+    freq = dice_frequency(number)
+    if dice < freq:
+        result = 1
+    else:
+        for n in range(dice - freq, 6 - freq):
+            result += binomial(5 - freq, n)
+    return result * 100
+
+def     straight(number):
+    tab = set()
+    tab.update([ int(sys.argv[1]),  int(sys.argv[2]),  int(sys.argv[3]),  int(sys.argv[4]),  int(sys.argv[5])])
+    if len(tab) == 1:
+        tab.add(0)
+    pres = 6
+    if tab.issuperset([number]):
+        pres = 5
+    if tab.issuperset([0]):
+        result = math.factorial(pres - int(len(tab))) / pow(6, pres - int(len(tab)))
+    else:
+        result = math.factorial(pres - int(len(tab))) / pow(6, pres - int(len(tab)))
+    return result * 100
+    
+def     full(nb1, nb2):
+    result = 1.0
+    app1 = dice_frequency(nb1)
+    app2 = dice_frequency(nb2)
+    if (app1 > 3):
+        app1 = 3
+    if (app2 > 2):
+        app2 = 2
+    for n in range(5 - app1 - app2, 6 - app1 - app2):
+        result *= binomial(5 - app1 - app2, n)
+    if result > 0.1:
+        result = 0.1
+    return result * 1000
+
+def  get_result(arg, number) :
+    if arg == "pair":
+        print("Chances to get a " + str(number) + " pair", end='')
+        result = pair(number)
+    elif arg == "three":
+        result = three(number)
+        print("Chances to get a " + str(number) + " three-of-a-kind", end='')
+    elif arg == "four":
+        result = four(number)
+        print("Chances to get a " + str(number) + " four-of-a-kind", end='')
+    elif arg == "yams":
+        print("Chances to get a " + str(number) + " yams", end='')
+        result = yams(number)
+    elif arg == "straight":
+        print("Chances to get a " + str(number) + " straight", end='')
+        result = straight(number)
+    else:
+        result = -1
+    return result    
+
+def     combinaison(args):
+    arg = args.split('_')
+    if len(arg) == 2:
+        number = get_dice(arg[1])
+        result = get_result(arg[0], number)
+        if (result == -1) :
+            raise Exception("Invalid combination\n")
+        else :
+            print(": " + "%.2f" % result + "%")
+    elif len(arg) == 3:
+        if arg[0] == "full":
+            nb1 = get_dice(arg[1])
+            nb2 = get_dice(arg[2])
+            result = full(nb1, nb2)
+        else:
+            raise Exception("Only combination 'full' need 2 excepted value\n")
+        print("Chances to get a " + str(nb1) + " full of "
+              + str(nb2) + ": " + "%.2f" % result + "%")
+    else :
+        raise Exception("Invalid combination\n")
+
+
+def main ():
+    try :
+        if len(sys.argv) == 2:
+            if sys.argv[1] == "-h" or "--help":
+                man_help()
+                exit(0)
+        elif len(sys.argv) == 7:
+            result = 0.0
+            comb = ""
+            combinaison(sys.argv[6])
+        else:
+            raise Exception("Invalid number of argument\n")
+    except Exception as error:
+        sys.stdout.write(str(error))
+        exit(84)
+
+if __name__ == '__main__':
+    main()
+    sys.exit(0)

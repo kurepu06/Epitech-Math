@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+
+import sys
+import  time
+from math import *
+
+def man_help():
+    print("USAGE")
+    print("\t./203hotline [n k | d]\n")
+    print("DESCRIPTION")
+    print("\tn\tn value for the computation of C(n k)")
+    print("\tk\tk value for the computation of C(n k)")
+    print("\td\taverage duration of calls (in seconds)")
+    sys.exit(0)
+
+def coef(n, k):
+    a = factorial(n)
+    b = factorial(k)
+    c = factorial(n - k)
+    res = a // (b * c)
+    return (res)
+
+def binomiale(d):
+    overload = 0
+    i = 0
+    p = d / (8 * 60 * 60)
+    n = 3500
+    a = (coef(n, i)) * (p**i) * ((1 - p)**(n - i))
+    print("Binomial distribution:")
+    print("%d -> %0.3f" %(i, a), end='')
+    start = time.time()
+    while (i < 50):
+        i+=1
+        if (i > 0 and (i % 5) != (0)):
+            print("\t", end='')
+        a = (coef(n, i)) * (p**i) * ((1 - p)**(n - i))
+        print("%d -> %0.3f" %(i, a), end='')
+        if ((i + 1) % 5 == 0):
+            print("")
+        if i <= 25:
+            overload += a
+    print("")
+    end = time.time()
+    print("Overload: ", "%.1f%%" % ((1 - overload) * 100))
+    print("computation time: %.2f ms" % ((end - start) * 1000))
+
+
+def poisson(d):
+    overload = 0
+    i = 0
+    l = 3500 * (d / (3600 * 8))
+    a = exp(-l) * pow(l, i) / factorial(i)
+    print("Poisson distribution:")
+    print("%d -> %0.3f" %(i, a), end='')
+    start = time.time()
+    while (i < 50):
+        i+=1
+        if (i > 0 and (i % 5) != (0)):
+            print("\t", end='')
+        a = exp(-l) * pow(l, i) / factorial(i)
+        print("%d -> %0.3f" %(i, a), end='')
+        if ((i + 1) % 5 == 0):
+            print("")
+        if i <= 25:
+            overload += a
+    print("")
+    end = time.time()
+    print("Overload: ", "%.1f%%" % ((1 - overload) * 100))
+    print("computation time: %.2f ms" % ((end - start) * 1000))
+
+if __name__ == '__main__':
+    if (len(sys.argv) > 3 or len(sys.argv) < 2):
+        print ("ERROR: not the right number of argument")
+        exit(84)
+    else:
+        try:
+            if (len(sys.argv) == 2 and sys.argv[1] == "-h"):
+                man_help()        
+            elif(len(sys.argv) == 2):
+                d = int(sys.argv[1])
+                binomiale(d)
+                print("")
+                poisson(d)
+                exit(0)
+            elif(len(sys.argv) == 3):
+                n = int(sys.argv[1])
+                k = int(sys.argv[2])
+                print("%d-combination of a %d set:\n%d" %(k, n, coef(n, k)))
+                exit(0)
+        except ValueError:
+            print ("Error : Not the right type of parameter !")
+            exit(84)

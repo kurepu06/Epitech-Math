@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+
+import argparse
+import sys
+import time
+import math
+
+def man_help():
+    print("USAGE")
+    print("\t./204ducks a\n")
+    print("DESCRIPTION")
+    print("\ta\tconstant")
+    sys.exit(0)
+
+def proba (a, t) :
+    return a * math.exp(-t) + (4 - 3 * a) * math.exp(-2 * t) + (2 * a - 4) * math.exp(-4 * t)
+
+def proba_density(a, t):
+    return -a * math.exp(-t) - (4 - 3 * a) / 2 * math.exp(-2 * t) - (2 * a - 4) / 4 * math.exp(-4 * t)
+
+def time(t):
+    print("%dm %d%ds" %((t / 60), (t % 60 / 10), (t % 10) + 1))
+
+def time_back(a, min):
+    i = 1.0
+    while (1):
+        if (proba_density(a, i / 60) - proba_density(a, 0) >= min):
+            return i
+        i += 0.01        
+def average_time(r):
+    print("Average return time: %dm %02ds" % divmod(r * 60, 60))
+
+def standard_division(d):
+    print("Standard deviation: %.3f" % d)
+
+def back_after(a):
+    print("Percentage of ducks back after 1 minute: %0.1f%%" %((proba_density(a, 1) - proba_density(a, 0)) * 100))
+    print("Percentage of ducks back after 2 minutes: %0.1f%%" %((proba_density(a, 2) - proba_density(a, 0)) * 100))
+    
+if __name__ == '__main__':
+    if (len(sys.argv) > 2 or len(sys.argv) < 2):
+        print ("ERROR: not the right number of argument")
+        exit(84)
+    else:
+        try:
+            if (len(sys.argv) == 2 and sys.argv[1] == "-h"):
+                man_help()      
+            elif(len(sys.argv) == 2):
+                a = float(sys.argv[1])
+                if (a < 0 or a > 2.5):
+                    print ("ERROR: a must be between 0 and 2.5")
+                    exit(84)
+                p = 0
+                r = 0
+                t = 0
+                while p < 99.9999:
+                    p += proba(a, t) / 10
+                    r += (proba(a, t) / 10) * t
+                    t += 0.001
+                r = (r / 99.9999) + 1./60
+                average_time(r)
+                d = 0
+                while t > 0:
+                    d += ((t - r) ** 2) * (proba(a, t) / 10)
+                    t -= 0.001
+                d = (d / 99.999) ** 0.5
+                standard_division(d)
+                t = time_back(a, 0.5)
+                print("Time after which 50% of the ducks are back: ", end='')
+                time(t-1)
+                t = time_back(a, 0.99)
+                print("Time after which 99% of the ducks are back: ", end='')
+                time(t-1)
+                back_after(a)
+                exit(0)
+        except ValueError:
+            print ("Error : Not the right type of parameter !")
+            exit(84)    
